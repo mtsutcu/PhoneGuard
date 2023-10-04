@@ -81,7 +81,7 @@ fun HomeScreen(
                             }
                         }
                         Image(
-                            painter = painterResource(id = R.drawable.cy),
+                            painter = painterResource(id = R.drawable.security_icon),
                             contentDescription = "",
                             colorFilter = ColorFilter.lighting(Color.Transparent,MaterialTheme.colorScheme.onSurface),
                             modifier = Modifier.padding(8.dp)
