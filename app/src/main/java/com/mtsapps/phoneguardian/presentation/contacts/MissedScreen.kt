@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Divider
-import androidx.compose.material.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -80,11 +80,11 @@ fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsVie
             horizontalAlignment = Alignment.CenterHorizontally
         ) {itemsIndexed(items = callLogList){index, item ->
             val containName = item.number?.let { phones?.contains(it) } == true
-            CallLogCard(name = item.name, number =if(!item.number.isNullOrEmpty()) item.number else "Unknown", photo =item.photoUri ,isExpanded = isExpanded,
+            CallLogCard(name = item.name.nameFromUnknownCaller(), number =if(!item.number.isNullOrEmpty()) item.number else "Unknown", photo =item.photoUri ,isExpanded = isExpanded,
                 index = index,
                 buttonText = if (item.number.let { phones?.contains(it) } == true) "Unblock" else "Block",
                 itemOnClick = {
-                    if (isExpanded.value == index) isExpanded.value = -1 else isExpanded.value =
+                    if (isExpanded.intValue == index) isExpanded.intValue = -1 else isExpanded.intValue =
                         index
 
                 },
@@ -104,7 +104,7 @@ fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsVie
                     }
                 })
             if ( index != callLogList.lastIndex){
-                Divider(thickness = 1.dp, modifier = modifier.padding(start = 60.dp))
+                HorizontalDivider(thickness = 1.dp, modifier = modifier.padding(start = 60.dp))
             }
         }
 

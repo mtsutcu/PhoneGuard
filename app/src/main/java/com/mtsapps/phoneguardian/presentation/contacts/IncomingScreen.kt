@@ -1,7 +1,6 @@
 package com.mtsapps.phoneguardian.presentation.contacts
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mtsapps.phoneguardian.data.entities.Contact
 import com.mtsapps.phoneguardian.domain.models.CallContact
@@ -42,7 +40,7 @@ fun IncomingScreen(
     val phones = uiState.phoneNumbersList
     val categoryList = uiState.categoryList
 
-    Scaffold(contentColor = Color.Blue) { innerPaddig ->
+    Scaffold { _ ->
         val isExpanded = remember { mutableIntStateOf(-1) }
         val bottomSheetStateState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val openBottomSheetState = rememberSaveable { mutableStateOf(false) }
@@ -83,15 +81,13 @@ fun IncomingScreen(
         }
         LazyColumn(
             modifier = modifier
-                .padding(innerPaddig).background(color = MaterialTheme.colorScheme.surface)
+                .background(color = MaterialTheme.colorScheme.surface)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             itemsIndexed(items = callLogList) { index, item ->
                 val containName = item.number?.let { phones?.contains(it) } == true
-                Log.e("icominng",item.toString())
-
 
                 CallLogCard(
                     name = if (!item.name.isNullOrEmpty()) item.name else "Unknown",
