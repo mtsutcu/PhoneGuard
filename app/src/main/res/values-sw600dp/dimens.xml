@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paddings -->
+    <dimen name="padding2">6dp</dimen>
+    <dimen name="padding4">12dp</dimen>
+    <dimen name="padding5">15dp</dimen>
+    <dimen name="padding6">18dp</dimen>
+    <dimen name="padding8">24dp</dimen>
+    <dimen name="padding10">30dp</dimen>
+    <dimen name="padding12">36dp</dimen>
+    <dimen name="padding16">48dp</dimen>
+    <dimen name="padding25">75dp</dimen>
+    <dimen name="padding30">90dp</dimen>
+
+    <!-- Sizes -->
+    <dimen name="size4">12dp</dimen>
+    <dimen name="size5">15dp</dimen>
+    <dimen name="size8">24dp</dimen>
+    <dimen name="size12">36dp</dimen>
+    <dimen name="size20">60dp</dimen>
+    <dimen name="size22">66dp</dimen>
+
+    <dimen name="blockBottomSheetImageSize">150dp</dimen>
+    <dimen name="categoriesCardHight">375dp</dimen>
+    <dimen name="categoriesCardRoundedImageSize">67dp</dimen>
+    <dimen name="homePageMainImageSize">300dp</dimen>
+    <dimen name="homePageColumnItemImageSize">67dp</dimen>
+    <dimen name="homePagePulseAnimationSize">550dp</dimen>
+    <dimen name="onboardingIndicatorSelectedSize">38dp</dimen>
+    <dimen name="onboardingIndicatorUnselectedSize">15dp</dimen>
+
+    <!-- Tonal Elevations -->
+    <dimen name="tonalElevation3">6dp</dimen>
+
+
+    <!-- Integers -->
+    <integer name="callLogCardRoundedImagePercent">100</integer>
+    <integer name="callLogCardRoundedButtonPercent">25</integer>
+    <integer name="blockBottomSheetRoundedImagePercent">100</integer>
+    <integer name="blockBottomSheetRoundedButtonPercent">25</integer>
+    <integer name="categoriesCardRoundedImagePercent">100</integer>
+    <integer name="categoriesCardRoundedButtonPercent">25</integer>
+    <integer name="homePageRoundedImagePercent">50</integer>
+    <integer name="homePageColumnItemRoundedImagePercent">100</integer>
+    <integer name="homePageColumnItemRoundedButtonPercent">25</integer>
+    <dimen name="fab_margin">24dp</dimen>
+
+</resources>

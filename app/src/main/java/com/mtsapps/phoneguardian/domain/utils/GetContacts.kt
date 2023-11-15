@@ -4,11 +4,17 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.provider.ContactsContract
-import com.mtsapps.phoneguardian.domain.models.CallContact
+import android.telephony.PhoneNumberUtils
+import android.telephony.TelephonyManager
+import androidx.core.content.getSystemService
+import com.mtsapps.phoneguardian.data.entities.CallContact
+import java.util.Locale
 
 class GetContacts {
     companion object {
         fun readContactsWithPhotos(context: Context): List<CallContact> {
+            val telephonyManager = context.getSystemService() as TelephonyManager?
+            val countryIso = telephonyManager?.networkCountryIso?.uppercase(Locale.getDefault())
             val contacts = mutableListOf<CallContact>()
 
             val contentResolver: ContentResolver = context.contentResolver
@@ -35,7 +41,8 @@ class GetContacts {
                     val photoUriString =
                         it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
 
-                    val contact = CallContact(name, phoneNumber.filterNot { it == '(' || it == ')' || it == '-' || it == '+' || it == ' '}.trim(), photoUriString)
+                    val contact = CallContact(name = name, number = PhoneNumberUtils.formatNumber(phoneNumber,countryIso),
+                        photoUri =  photoUriString, type = "contact")
                     contacts.add(contact)
                 }
             }

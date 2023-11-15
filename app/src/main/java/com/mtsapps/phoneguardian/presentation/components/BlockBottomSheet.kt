@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -33,20 +32,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mtsapps.phoneguardian.R
+import com.mtsapps.phoneguardian.data.entities.CallContact
 import com.mtsapps.phoneguardian.data.entities.Category
-import com.mtsapps.phoneguardian.domain.models.CallContact
 import com.mtsapps.phoneguardian.domain.utils.nameFromUnknownCaller
-import com.mtsapps.phoneguardian.domain.utils.toNumberFormat
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlockBottomSheet(
+    modifier: Modifier = Modifier,
     bottomSheetState: SheetState,
     openBottomSheetState: MutableState<Boolean>,
     categoryList: List<Category>,
@@ -75,13 +76,13 @@ fun BlockBottomSheet(
         dragHandle = { BottomSheetDefaults.DragHandle() }) {
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight(fraction = 0.5f)
-                .padding(vertical = 16.dp)
+                .padding(vertical = dimensionResource(id = R.dimen.padding8))
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 if (bottomSheetCallContactState.value.photoUri != null) {
@@ -91,21 +92,23 @@ fun BlockBottomSheet(
                                 .data(data = bottomSheetCallContactState.value.photoUri).build()
                         ),
                         contentDescription = "",
-                        modifier = Modifier
-                            .size(100.dp)
+                        modifier = modifier
+                            .size(dimensionResource(id = R.dimen.blockBottomSheetImageSize))
                             .clip(
-                                RoundedCornerShape(percent = 100)
+                                RoundedCornerShape(integerResource(id = R.integer.blockBottomSheetRoundedImagePercent))
                             ), contentScale = ContentScale.FillBounds
                     )
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.image_person),
                         contentDescription = "",
-                        modifier = Modifier
-                            .size(100.dp)
+                        modifier = modifier
+                            .size(dimensionResource(id = R.dimen.blockBottomSheetImageSize))
                             .clip(
-                                RoundedCornerShape(percent = 100)
-                            ).background(color = Color.LightGray).padding(4.dp), contentScale = ContentScale.FillBounds
+                                RoundedCornerShape(integerResource(id = R.integer.blockBottomSheetRoundedImagePercent))
+                            )
+                            .background(color = Color.LightGray)
+                            .padding(dimensionResource(id = R.dimen.padding2)), contentScale = ContentScale.FillBounds
                     )
                 }
                 Column {
@@ -117,7 +120,7 @@ fun BlockBottomSheet(
                         )
                         bottomSheetCallContactState.value.number?.let {
                             Text(
-                                text = it.toNumberFormat(),
+                                text = it,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
@@ -125,18 +128,18 @@ fun BlockBottomSheet(
                     }
                     ExposedDropdownMenuBox(
                         expanded = isExpandedDropDown,
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxWidth(0.7f)
-                            .padding(vertical = 16.dp),
+                            .padding(vertical = dimensionResource(id = R.dimen.padding8)),
                         onExpandedChange = { isExpandedDropDown = !isExpandedDropDown },
                     ) {
                         TextField(
                             // The `menuAnchor` modifier must be passed to the text field for correctness.
-                            modifier = Modifier.menuAnchor(),
+                            modifier = modifier.menuAnchor(),
                             readOnly = true,
                             value = expandedMenuValue.name,
                             onValueChange = {},
-                            label = { Text("Category") },
+                            label = { Text(stringResource(id = R.string.categoryText)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpandedDropDown) },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(
                                 focusedTextColor = Color(
@@ -176,12 +179,19 @@ fun BlockBottomSheet(
                     )
 
                 },
-                shape = RoundedCornerShape(25),
-                modifier = Modifier
-                    .padding(horizontal = 32.dp, vertical = 16.dp)
+                shape = RoundedCornerShape(integerResource(id = R.integer.blockBottomSheetRoundedButtonPercent)),
+                modifier = modifier
+                    .padding(
+                        horizontal = dimensionResource(id = R.dimen.padding16),
+                        vertical = dimensionResource(
+                            id = R.dimen.padding8
+                        )
+                    )
                     .fillMaxWidth()
             ) {
-                Text(text = if (isBlocked.value) "Unblock" else "Block")
+                Text(text = if (isBlocked.value) stringResource(id = R.string.unblockText) else stringResource(
+                    id = R.string.blockText
+                ))
 
             }
         }

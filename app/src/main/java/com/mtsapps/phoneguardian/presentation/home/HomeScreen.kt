@@ -1,7 +1,6 @@
 package com.mtsapps.phoneguardian.presentation.home
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -41,9 +40,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -58,50 +59,62 @@ import md_theme_dark_primary
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
-
     val contacts = homeViewModel.contacts.observeAsState().value
     val blockStatus = homeViewModel.blockStatus.observeAsState().value
     val scope = rememberCoroutineScope()
-
-
     Scaffold { _ ->
         contacts?.let {
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding8))
                     .fillMaxSize()
             ) {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.6f), verticalArrangement = Arrangement.SpaceEvenly,horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Box {
                         Box(modifier = Modifier.align(Alignment.Center)) {
-                            if(blockStatus == true){
+                            if (blockStatus == true) {
                                 PulseAnimation()
                             }
                         }
                         Image(
                             painter = painterResource(id = R.drawable.security_icon),
                             contentDescription = "",
-                            colorFilter = ColorFilter.lighting(Color.Transparent,MaterialTheme.colorScheme.onSurface),
-                            modifier = Modifier.padding(8.dp)
-                                .size(200.dp)
-                                .clip(shape = RoundedCornerShape(50))
-                                .align(Alignment.Center).background(color = MaterialTheme.colorScheme.surface)
+                            colorFilter = ColorFilter.lighting(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier
+                                .padding(dimensionResource(id = R.dimen.padding4))
+                                .size(dimensionResource(id = R.dimen.homePageMainImageSize))
+                                .clip(shape = RoundedCornerShape(integerResource(id = R.integer.homePageRoundedImagePercent)))
+                                .align(Alignment.Center)
+                                .background(color = MaterialTheme.colorScheme.surface)
                         )
                     }
 
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "PROTECTION", style = MaterialTheme.typography.titleLarge)
-                            Switch(checked = blockStatus ?: false, onCheckedChange = {
-                               scope.launch {
-                                   homeViewModel.updateBlockStatus(status = it)
-                                   Log.e("homee",blockStatus.toString())
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.protectionText).uppercase(),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Switch(checked = blockStatus ?: false, onCheckedChange = {
+                            scope.launch {
+                                homeViewModel.updateBlockStatus(status = it)
 
-                               }
-                            })
+                            }
+                        })
 
-                        }
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -109,14 +122,22 @@ fun HomeScreen(
                         .align(Alignment.BottomCenter)
 
                 ) {
-                    if (contacts.isNotEmpty()){
-                        Text(text = "Blocked", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 8.dp))
+                    if (contacts.isNotEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.blockedText),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(
+                                vertical = dimensionResource(
+                                    id = R.dimen.padding4
+                                )
+                            )
+                        )
                     }
                     LazyColumn(
-                        modifier =Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.size8)),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        contentPadding = PaddingValues(vertical = 8.dp)
+                        contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding4))
                     ) {
                         itemsIndexed(items = contacts) { _, item ->
                             Column(
@@ -126,7 +147,7 @@ fun HomeScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         if (item.photoUri == null) {
@@ -134,12 +155,16 @@ fun HomeScreen(
                                                 painter = painterResource(id = R.drawable.image_person),
                                                 contentDescription = "",
                                                 modifier = Modifier
-                                                    .size(45.dp)
+                                                    .size(dimensionResource(id = R.dimen.homePageColumnItemImageSize))
                                                     .clip(
-                                                        RoundedCornerShape(percent = 100)
+                                                        RoundedCornerShape(
+                                                            percent = integerResource(
+                                                                id = R.integer.homePageColumnItemRoundedImagePercent
+                                                            )
+                                                        )
                                                     )
                                                     .background(color = Color.LightGray)
-                                                    .padding(4.dp),
+                                                    .padding(dimensionResource(id = R.dimen.padding2)),
                                                 contentScale = ContentScale.FillBounds
                                             )
                                         } else {
@@ -151,14 +176,20 @@ fun HomeScreen(
                                                 ),
                                                 contentDescription = "",
                                                 modifier = Modifier
-                                                    .size(45.dp)
+                                                    .size(dimensionResource(id = R.dimen.homePageColumnItemImageSize))
                                                     .clip(
-                                                        RoundedCornerShape(percent = 100)
+                                                        RoundedCornerShape(
+                                                            percent = integerResource(
+                                                                id = R.integer.homePageColumnItemRoundedImagePercent
+                                                            )
+                                                        )
                                                     ), contentScale = ContentScale.FillBounds
                                             )
                                         }
 
-                                        Column(modifier = Modifier.padding(start = 16.dp)) {
+                                        Column(modifier = Modifier.padding(start = dimensionResource(
+                                            id = R.dimen.padding8
+                                        ))) {
                                             Text(
                                                 text = item.name.toString(),
                                                 style = MaterialTheme.typography.titleSmall,
@@ -170,9 +201,9 @@ fun HomeScreen(
                                         }
                                     }
                                     OutlinedButton(onClick = {
-                                                             homeViewModel.deleteContact(item)
-                                    }, shape = RoundedCornerShape(25)) {
-                                        Text(text = "Unblock")
+                                        homeViewModel.deleteContact(item)
+                                    }, shape = RoundedCornerShape(percent = integerResource(id = R.integer.homePageColumnItemRoundedButtonPercent))) {
+                                        Text(text = stringResource(id = R.string.unblockText))
 
                                     }
                                 }
@@ -191,9 +222,9 @@ fun HomeScreen(
 
 @Composable
 fun PulseAnimation() {
+    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
-
         ) {
         val transition = rememberInfiniteTransition(label = "")
         val duration = 2000
@@ -210,7 +241,7 @@ fun PulseAnimation() {
             )
         }
         Canvas(modifier = Modifier) {
-            val radius = 350.dp.toPx() / 2f
+            val radius = context.resources.getDimensionPixelSize(R.dimen.homePagePulseAnimationSize) / 2f
             progress.forEach {
                 drawCircle(
                     color = md_theme_dark_primary.copy(alpha = 1f - it.value),
@@ -220,4 +251,5 @@ fun PulseAnimation() {
             }
         }
     }
+
 }

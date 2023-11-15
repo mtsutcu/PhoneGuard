@@ -24,12 +24,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mtsapps.phoneguardian.R
-import com.mtsapps.phoneguardian.domain.utils.toNumberFormat
 
 @Composable
 fun CallLogCard(
@@ -56,17 +56,19 @@ fun CallLogCard(
         Column(verticalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.padding(12.dp)
+                modifier = modifier.padding(dimensionResource(id = R.dimen.padding6))
             ) {
                 if (photo == null) {
                     Image(
                         painter = painterResource(id = R.drawable.image_person) ,
                         contentDescription = "",
                         modifier = modifier
-                            .size(45.dp)
+                            .size(dimensionResource(id = R.dimen.size22))
                             .clip(
-                                RoundedCornerShape(percent = 100)
-                            ).background(color = Color.LightGray).padding(4.dp), contentScale = ContentScale.FillBounds
+                                RoundedCornerShape(percent = integerResource(id = R.integer.callLogCardRoundedImagePercent))
+                            )
+                            .background(color = Color.LightGray)
+                            .padding(dimensionResource(id = R.dimen.padding2)), contentScale = ContentScale.FillBounds
                     )
                 } else {
                     Image(
@@ -75,9 +77,9 @@ fun CallLogCard(
                             .build()),
                         contentDescription = "",
                         modifier = modifier
-                            .size(45.dp)
+                            .size(dimensionResource(id = R.dimen.size22))
                             .clip(
-                                RoundedCornerShape(percent = 100)
+                                RoundedCornerShape(percent = integerResource(id = R.integer.callLogCardRoundedImagePercent))
                             ), contentScale = ContentScale.FillBounds
                     )
                 }
@@ -85,14 +87,14 @@ fun CallLogCard(
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding8))
                 ) {
                     Text(
                         text = name.toString(),
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Text(
-                        text = number.toNumberFormat(),
+                        text = number,
                         style = MaterialTheme.typography.bodySmall,
                     )
                     AnimatedVisibility(visible = isExpanded.intValue == index) {
@@ -101,9 +103,14 @@ fun CallLogCard(
                             onClick = {
                                 buttonOnClick.invoke(number)
                             },
-                            shape = RoundedCornerShape(25),
+                            shape = RoundedCornerShape(integerResource(id = R.integer.callLogCardRoundedButtonPercent)),
                             modifier = modifier
-                                .padding(top = 8.dp, end = 16.dp)
+                                .padding(
+                                    top = dimensionResource(id = R.dimen.padding4),
+                                    end = dimensionResource(
+                                        id = R.dimen.padding8
+                                    )
+                                )
                                 .fillMaxWidth()
                         ) {
                             Text(text = buttonText)

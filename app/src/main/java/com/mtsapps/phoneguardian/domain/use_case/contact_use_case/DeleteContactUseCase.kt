@@ -1,4 +1,4 @@
-package com.mtsapps.phoneguardian.domain.use_case
+package com.mtsapps.phoneguardian.domain.use_case.contact_use_case
 
 import com.mtsapps.phoneguardian.data.entities.Contact
 import com.mtsapps.phoneguardian.data.repository.ContactRepositoryImpl

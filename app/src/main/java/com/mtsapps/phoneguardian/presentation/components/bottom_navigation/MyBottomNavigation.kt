@@ -7,16 +7,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun MyBotttomNavigation(navController: NavController) {
+    val context = LocalContext.current
     val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.ContactsMain,
-        BottomNavItem.Categories
+        BottomNavItem.Home(context),
+        BottomNavItem.ContactsMain(context),
+        BottomNavItem.Categories(context)
     )
 
     NavigationBar {

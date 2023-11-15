@@ -6,10 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mtsapps.phoneguardian.data.entities.Contact
-import com.mtsapps.phoneguardian.domain.use_case.DeleteContactUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetBlockStatusUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetContactsUseCase
-import com.mtsapps.phoneguardian.domain.use_case.UpdateBlockStatusUseCase
+import com.mtsapps.phoneguardian.domain.use_case.call_contacts_use_case.InsertCallContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.DeleteContactUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.GetContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.pref_data_store_use_case.GetBooleanPrefUseCase
+import com.mtsapps.phoneguardian.domain.use_case.pref_data_store_use_case.UpdateBooleanPrefUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,10 +18,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
-    private val getBlockStatusUseCase: GetBlockStatusUseCase,
-    private val updateBlockStatusUseCase: UpdateBlockStatusUseCase,
-    private val deleteContactUseCase: DeleteContactUseCase
-) : ViewModel() {
+    private val getBooleanPrefUseCase: GetBooleanPrefUseCase,
+    private val updateBooleanPrefUseCase: UpdateBooleanPrefUseCase,
+    private val deleteContactUseCase: DeleteContactUseCase,
+    private val insertCallContactsUseCase: InsertCallContactsUseCase,
+    ) : ViewModel() {
 
     private val _contacts = MutableLiveData<List<Contact>>()
     val contacts: LiveData<List<Contact>>
@@ -43,14 +45,14 @@ class HomeViewModel @Inject constructor(
 
     private fun getBlockStatus(){
         viewModelScope.launch {
-            getBlockStatusUseCase(booleanPreferencesKey("isBlock")).collect{
+            getBooleanPrefUseCase(booleanPreferencesKey("isBlock")).collect{
                 _blockStatus.value = it
             }
         }
     }
     fun updateBlockStatus(status : Boolean){
         viewModelScope.launch {
-            updateBlockStatusUseCase(key = booleanPreferencesKey("isBlock"),status=status)
+            updateBooleanPrefUseCase(key = booleanPreferencesKey("isBlock"),status=status)
         }
     }
     fun deleteContact(contact: Contact){
@@ -58,4 +60,5 @@ class HomeViewModel @Inject constructor(
             deleteContactUseCase(contact = contact)
         }
     }
+
 }

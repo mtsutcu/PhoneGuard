@@ -1,15 +1,21 @@
 package com.mtsapps.phoneguardian.domain.utils
 
 import android.content.ContentResolver
+import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CallLog
 import android.provider.ContactsContract
-import com.mtsapps.phoneguardian.domain.models.CallContact
+import android.telephony.PhoneNumberUtils
+import android.telephony.TelephonyManager
+import androidx.core.content.getSystemService
+import com.mtsapps.phoneguardian.data.entities.CallContact
+import java.util.Locale
+
 
 class GetCallLogs {
     companion object{
-        fun getContactInfo(contentResolver: ContentResolver, phoneNumber: String): Pair<String?, String?> {
+        private  fun getContactInfo(contentResolver: ContentResolver, phoneNumber: String): Pair<String?, String?>{
             val projection =
                 arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_URI)
             val uri = Uri.withAppendedPath(
@@ -35,7 +41,11 @@ class GetCallLogs {
             return Pair(contactName, contactPhoto)
         }
 
-        fun readIncomingCalls(contentResolver: ContentResolver): List<CallContact> {
+        fun readIncomingCalls(context: Context): List<CallContact> {
+            val telephonyManager = context.getSystemService() as TelephonyManager?
+            val countryIso = telephonyManager?.networkCountryIso?.uppercase(Locale.getDefault())
+            val contentResolver: ContentResolver = context.contentResolver
+
             val callList = mutableSetOf<CallContact>()
             val projection = arrayOf(
                 CallLog.Calls._ID,
@@ -44,8 +54,6 @@ class GetCallLogs {
                 CallLog.Calls.DURATION,
                 CallLog.Calls.TYPE,
             )
-
-
             val sortOrder = "${CallLog.Calls.DATE} DESC"
             val cursor: Cursor? = contentResolver.query(
                 CallLog.Calls.CONTENT_URI,
@@ -63,16 +71,13 @@ class GetCallLogs {
                     val contactInfo = getContactInfo(contentResolver, phoneNumber)
                     val contactName = contactInfo.first
                     val contactPhoto = contactInfo.second
-                    val callId = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls._ID))
-                    val callDate = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls.DATE))
-                    val callDuration = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     val callType = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE))
                     if (callType == CallLog.Calls.INCOMING_TYPE || callType == CallLog.Calls.REJECTED_TYPE) {
                         callList.add(
                             CallContact(
                                 name = contactName,
-                                number = phoneNumber.toString(),
-                                photoUri = contactPhoto
+                                number = PhoneNumberUtils.formatNumber(phoneNumber,countryIso),
+                                photoUri = contactPhoto, type = "incoming"
                             )
                         )
                     }
@@ -81,7 +86,10 @@ class GetCallLogs {
             }
             return callList.toList()
         }
-        fun readMissedCalls(contentResolver: ContentResolver): List<CallContact> {
+        fun readMissedCalls(context: Context): List<CallContact> {
+            val telephonyManager = context.getSystemService() as TelephonyManager?
+            val countryIso = telephonyManager?.networkCountryIso?.uppercase(Locale.getDefault())
+            val contentResolver: ContentResolver = context.contentResolver
             val callList = mutableSetOf<CallContact>()
             val projection = arrayOf(
                 CallLog.Calls._ID,
@@ -109,16 +117,14 @@ class GetCallLogs {
                     val contactInfo = getContactInfo(contentResolver, phoneNumber)
                     val contactName = contactInfo.first
                     val contactPhoto = contactInfo.second
-                    val callId = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls._ID))
-                    val callDate = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls.DATE))
-                    val callDuration = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     val callType = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE))
                     if (callType == CallLog.Calls.MISSED_TYPE) {
                         callList.add(
                             CallContact(
                                 name = contactName,
-                                number = phoneNumber.toString(),
-                                photoUri = contactPhoto
+                                number = PhoneNumberUtils.formatNumber(phoneNumber,countryIso),
+                                photoUri = contactPhoto,
+                                type = "missed"
                             )
                         )
                     }
@@ -127,7 +133,10 @@ class GetCallLogs {
             }
             return callList.toList()
         }
-        fun readOutgoingCalls(contentResolver: ContentResolver): List<CallContact> {
+        fun readOutgoingCalls(context: Context): List<CallContact> {
+            val telephonyManager = context.getSystemService() as TelephonyManager?
+            val countryIso = telephonyManager?.networkCountryIso?.uppercase(Locale.getDefault())
+            val contentResolver: ContentResolver = context.contentResolver
             val callList = mutableSetOf<CallContact>()
             val projection = arrayOf(
                 CallLog.Calls._ID,
@@ -155,16 +164,14 @@ class GetCallLogs {
                     val contactInfo = getContactInfo(contentResolver, phoneNumber)
                     val contactName = contactInfo.first
                     val contactPhoto = contactInfo.second
-                    val callId = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls._ID))
-                    val callDate = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls.DATE))
-                    val callDuration = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
                     val callType = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE))
                     if (callType == CallLog.Calls.OUTGOING_TYPE) {
                         callList.add(
                             CallContact(
                                 name = contactName,
-                                number = phoneNumber.toString(),
-                                photoUri = contactPhoto
+                                number = PhoneNumberUtils.formatNumber(phoneNumber,countryIso),
+                                photoUri = contactPhoto,
+                                type = "outgoing"
                             )
                         )
                     }

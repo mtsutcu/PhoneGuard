@@ -1,15 +1,15 @@
 package com.mtsapps.phoneguardian.presentation.contacts
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mtsapps.phoneguardian.data.entities.Contact
 import com.mtsapps.phoneguardian.data.repository.ContactRepositoryImpl
-import com.mtsapps.phoneguardian.domain.use_case.DeleteContactUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetAllPhoneNumbersUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetCategoriesWithContactsUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetContactsUseCase
-import com.mtsapps.phoneguardian.domain.use_case.InsertContactUseCase
+import com.mtsapps.phoneguardian.domain.use_case.call_contacts_use_case.GetCallContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.categories_use_case.GetCategoriesWithContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.DeleteContactUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.GetAllPhoneNumbersUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.GetContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.InsertContactUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,9 @@ class ContactsViewModel @Inject constructor(
     private val getPersonsUseCase: GetContactsUseCase,
     private val getAllPhoneNumbersUseCase: GetAllPhoneNumbersUseCase,
     private val deleteContactUseCase: DeleteContactUseCase,
-    private val categoriesRepositoryImpl: ContactRepositoryImpl
+    private val categoriesRepositoryImpl: ContactRepositoryImpl,
+    private val getCallContactsUseCase: GetCallContactsUseCase
+
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PersonsUIState())
     val uiState: StateFlow<PersonsUIState> = _uiState.asStateFlow()
@@ -39,6 +41,42 @@ class ContactsViewModel @Inject constructor(
         getCategories()
     }
 
+    fun getLocalContacts() {
+        viewModelScope.launch {
+            getCallContactsUseCase("contact").collect {
+                _uiState.update { uiState ->
+                    uiState.copy(localContactList = it)
+                }
+            }
+        }
+    }
+    fun getIncomingCalls(){
+        viewModelScope.launch {
+            getCallContactsUseCase("incoming").collect {
+                _uiState.update { uiState ->
+                    uiState.copy(incomingCalls = it)
+                }
+            }
+        }
+    }
+    fun getOutgoingCalls(){
+        viewModelScope.launch {
+            getCallContactsUseCase("outgoing").collect {
+                _uiState.update { uiState ->
+                    uiState.copy(outgoingCalls = it)
+                }
+            }
+        }
+    }
+    fun getMissedCalls(){
+        viewModelScope.launch {
+            getCallContactsUseCase("missed").collect {
+                _uiState.update { uiState ->
+                    uiState.copy(missedCalls = it)
+                }
+            }
+        }
+    }
     fun insertContact(contact: Contact){
         viewModelScope.launch {
                 insertContactUseCase(contact = contact)
@@ -56,7 +94,6 @@ class ContactsViewModel @Inject constructor(
                 _uiState.update { uiState->
                     uiState.copy(phoneNumbersList =numbers )
                 }
-                Log.e("numberrs",numbers.toString())
             }
         }
     }

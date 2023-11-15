@@ -25,5 +25,4 @@ class CategoryCallBack(private val provider: Provider<CategoryDao>) :
             }
         }
     }
-
 }

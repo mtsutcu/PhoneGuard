@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mtsapps.phoneguardian.data.entities.Category
 import com.mtsapps.phoneguardian.data.entities.Contact
-import com.mtsapps.phoneguardian.domain.use_case.DeleteContactUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetCategoriesUseCase
-import com.mtsapps.phoneguardian.domain.use_case.GetCategoriesWithContactsUseCase
-import com.mtsapps.phoneguardian.domain.use_case.UpdateCategoryUseCase
+import com.mtsapps.phoneguardian.domain.use_case.categories_use_case.GetCategoriesUseCase
+import com.mtsapps.phoneguardian.domain.use_case.categories_use_case.GetCategoriesWithContactsUseCase
+import com.mtsapps.phoneguardian.domain.use_case.contact_use_case.DeleteContactUseCase
+import com.mtsapps.phoneguardian.domain.use_case.pref_data_store_use_case.UpdateCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +25,9 @@ class CategoriesViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CategoriesUIState())
     val uiState: StateFlow<CategoriesUIState> = _uiState.asStateFlow()
+
+
+
 
     init {
         getCategories()

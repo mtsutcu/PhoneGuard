@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "category_table")
 data class Category(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo("categoryID")
+    @ColumnInfo("categoryID",index = true)
     val categoryID: Long = 0,
     @ColumnInfo("name")
     val name: String,

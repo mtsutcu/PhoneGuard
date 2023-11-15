@@ -1,5 +1,6 @@
 package com.mtsapps.phoneguardian.presentation.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,7 +41,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -52,12 +56,25 @@ import com.mtsapps.phoneguardian.R
 import com.mtsapps.phoneguardian.data.entities.Category
 import com.mtsapps.phoneguardian.data.entities.CategoryWithContacts
 import com.mtsapps.phoneguardian.data.entities.Contact
-import com.mtsapps.phoneguardian.domain.utils.toNumberFormat
 import com.mtsapps.phoneguardian.domain.utils.toTimeFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(Category,Boolean)->Unit,setCategoryStartTime:(Category,String)->Unit,setCategoryEndTime:(Category,String)->Unit,setCategoryBlocked : (Category,Boolean)->Unit,buttonClickListner :(Contact)->Unit) {
+fun CategoriesCard(
+    modifier: Modifier= Modifier,
+    categoryWithContacts: CategoryWithContacts,
+    setCategoryTimer: (Category, Boolean) -> Unit,
+    setCategoryStartTime: (Category, String) -> Unit,
+    setCategoryEndTime: (Category, String) -> Unit,
+    setCategoryBlocked: (Category, Boolean) -> Unit,
+    buttonClickListner: (Contact) -> Unit,
+) {
+    Log.e("catt","category : ${categoryWithContacts.category.name} contacts: ${categoryWithContacts.contacts}")
+    val contactsList = remember {
+      mutableStateOf(categoryWithContacts.contacts)
+    }
+    Log.e("catt","category  : ${categoryWithContacts.category.name} contacts remember: ${contactsList.value}")
+
     val timePickerStateStartTime = rememberTimePickerState(is24Hour = true)
     val timePickerStateEndTime = rememberTimePickerState(is24Hour = true)
     var isVisibleTimes by remember { mutableStateOf(categoryWithContacts.category.isAlarm) }
@@ -75,39 +92,48 @@ fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(
     }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(250.dp),
+            .height(dimensionResource(id = R.dimen.categoriesCardHight)),
         shape = MaterialTheme.shapes.medium,
         onClick = { /*TODO*/ }) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = dimensionResource(id = R.dimen.padding8)),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "#${categoryWithContacts.category.name}", color = Color(categoryWithContacts.category.colorCode.toColorInt()))
+            Text(
+                text = "#${categoryWithContacts.category.name}",
+                color = Color(categoryWithContacts.category.colorCode.toColorInt())
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Timer")
-                Switch(modifier = Modifier.scale(0.5f), checked = isAlarmSwitchChecked, onCheckedChange = {
-                    isVisibleTimes = it
-                    isAlarmSwitchChecked = it
-                    setCategoryTimer.invoke(categoryWithContacts.category,it)
-                })
+                Text(text = stringResource(id = R.string.timerText))
+                Switch(
+                    modifier = modifier.scale(0.5f),
+                    checked = isAlarmSwitchChecked,
+                    onCheckedChange = {
+                        isVisibleTimes = it
+                        isAlarmSwitchChecked = it
+                        setCategoryTimer.invoke(categoryWithContacts.category, it)
+                    })
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Block")
-                Switch(modifier = Modifier.scale(0.5f), checked = isBlockedSwitchChecked, onCheckedChange = {
-                    isBlockedSwitchChecked = it
-                    setCategoryBlocked.invoke(categoryWithContacts.category,it)
-                })
+                Text(text = stringResource(id = R.string.blockText))
+                Switch(
+                    modifier = modifier.scale(0.5f),
+                    checked = isBlockedSwitchChecked,
+                    onCheckedChange = {
+                        isBlockedSwitchChecked = it
+                        setCategoryBlocked.invoke(categoryWithContacts.category, it)
+                    })
             }
 
         }
         AnimatedVisibility(visible = isVisibleTimes) {
             Row(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .clickable {
                     },
@@ -120,14 +146,20 @@ fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(
                     var textStateStartTime by remember {
                         mutableStateOf(categoryWithContacts.category.blockedStartTime)
                     }
-                    Text(text = "Start Time: $textStateStartTime")
+                    Text(text = stringResource(id = R.string.startTimeTextWithInput,textStateStartTime))
                     if (showTimePickerStartTime) {
                         TimePickerDialog(
                             onCancel = { showTimePickerStartTime = false },
                             onConfirm = {
                                 showTimePickerStartTime = false
-                                textStateStartTime = toTimeFormat(hour = timePickerStateStartTime.hour, minute = timePickerStateStartTime.minute)
-                                setCategoryStartTime.invoke(categoryWithContacts.category,textStateStartTime)
+                                textStateStartTime = toTimeFormat(
+                                    hour = timePickerStateStartTime.hour,
+                                    minute = timePickerStateStartTime.minute
+                                )
+                                setCategoryStartTime.invoke(
+                                    categoryWithContacts.category,
+                                    textStateStartTime
+                                )
 
                             }) {
                             TimePicker(state = timePickerStateStartTime)
@@ -135,17 +167,20 @@ fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(
                     }
                 }
                 TextButton(onClick = { showTimePickerEndTime = true }) {
-                    var textState by remember {
+                    var textStateEndTime by remember {
                         mutableStateOf(categoryWithContacts.category.blockedEndTime)
                     }
-                    Text(text = "End Time: $textState")
+                    Text(text = stringResource(id = R.string.endTimeTextWithInput,textStateEndTime))
                     if (showTimePickerEndTime) {
                         TimePickerDialog(
                             onCancel = { showTimePickerEndTime = false },
                             onConfirm = {
                                 showTimePickerEndTime = false
-                                textState = toTimeFormat(hour = timePickerStateEndTime.hour, minute = timePickerStateEndTime.minute)
-                                setCategoryEndTime.invoke(categoryWithContacts.category,textState)
+                                textStateEndTime = toTimeFormat(
+                                    hour = timePickerStateEndTime.hour,
+                                    minute = timePickerStateEndTime.minute
+                                )
+                                setCategoryEndTime.invoke(categoryWithContacts.category, textStateEndTime)
                             }) {
                             TimePicker(state = timePickerStateEndTime)
                         }
@@ -155,25 +190,31 @@ fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(
             }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
+            modifier = modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.size4)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(vertical = dimensionResource(id = R.dimen.padding4), horizontal = dimensionResource(
+                id = R.dimen.padding8
+            ))
         ) {
-            itemsIndexed(items = categoryWithContacts.contacts) { index, item ->
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    ) {
-                    Row(modifier = Modifier
+            itemsIndexed(items = categoryWithContacts.contacts,key = { _, item -> item.contactID  }) { _, item ->
+                Column(
+                    modifier = modifier
                         .fillMaxWidth()
-                        , horizontalArrangement = Arrangement.SpaceBetween) {
+                ) {
+                    Row(
+                        modifier = modifier
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (item.photoUri == null) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.image_person) ,
+                                    painter = painterResource(id = R.drawable.image_person),
                                     contentDescription = "",
-                                    modifier = Modifier
-                                        .size(45.dp)
+                                    modifier = modifier
+                                        .size(dimensionResource(id = R.dimen.categoriesCardRoundedImageSize))
                                         .clip(
-                                            RoundedCornerShape(percent = 100)
+                                            RoundedCornerShape(percent = integerResource(id = R.integer.categoriesCardRoundedImagePercent))
                                         )
                                         .background(color = Color.LightGray)
                                         .padding(4.dp), contentScale = ContentScale.FillBounds
@@ -183,46 +224,51 @@ fun CategoriesCard(categoryWithContacts: CategoryWithContacts,setCategoryTimer:(
                                     painter = rememberAsyncImagePainter(
                                         ImageRequest.Builder(LocalContext.current)
                                             .data(data = item.photoUri)
-                                            .build()),
+                                            .build()
+                                    ),
                                     contentDescription = "",
-                                    modifier = Modifier
-                                        .size(45.dp)
+                                    modifier = modifier
+                                        .size(dimensionResource(id = R.dimen.categoriesCardRoundedImageSize))
                                         .clip(
-                                            RoundedCornerShape(percent = 100)
+                                            RoundedCornerShape(percent = integerResource(id = R.integer.categoriesCardRoundedImagePercent))
                                         ), contentScale = ContentScale.FillBounds
                                 )
                             }
 
-                            Column(modifier = Modifier.padding(start = 16.dp)) {
+                            Column(modifier = modifier.padding(start = dimensionResource(id = R.dimen.padding8))) {
                                 Text(
                                     text = item.name.toString(),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Text(
-                                    text = item.number.toString().toNumberFormat(),
+                                    text = item.number.toString(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         }
-                        OutlinedButton(onClick = { buttonClickListner.invoke(item) }, shape = RoundedCornerShape(25)) {
-                            Text(text = "Unblock")
+                        OutlinedButton(
+                            onClick = { buttonClickListner.invoke(item) },
+                            shape = RoundedCornerShape(integerResource(id = R.integer.categoriesCardRoundedButtonPercent))
+                        ) {
+                            Text(text = stringResource(id = R.string.unblockText))
 
                         }
                     }
-                   }
                 }
-
             }
-        }
 
+        }
     }
+
+}
 
 
 @Composable
 fun TimePickerDialog(
-    title: String = "Select Time",
+    modifier: Modifier = Modifier,
+    title: String = stringResource(id = R.string.selectTimeText),
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     content: @Composable () -> Unit,
@@ -235,8 +281,8 @@ fun TimePickerDialog(
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 6.dp,
-            modifier = Modifier
+            tonalElevation = dimensionResource(id = R.dimen.tonalElevation3),
+            modifier = modifier
                 .width(IntrinsicSize.Min)
                 .height(IntrinsicSize.Min)
                 .background(
@@ -245,29 +291,29 @@ fun TimePickerDialog(
                 ),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = modifier.padding(dimensionResource(id = R.dimen.padding12)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxWidth()
-                        .padding(bottom = 20.dp),
+                        .padding(bottom = dimensionResource(id = R.dimen.padding10)),
                     text = title,
                     style = MaterialTheme.typography.labelMedium
                 )
                 content()
                 Row(
-                    modifier = Modifier
-                        .height(40.dp)
+                    modifier = modifier
+                        .height(dimensionResource(id = R.dimen.size20))
                         .fillMaxWidth()
                 ) {
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = modifier.weight(1f))
                     TextButton(
                         onClick = onCancel
-                    ) { Text("Cancel") }
+                    ) { Text(stringResource(id = R.string.cancelText)) }
                     TextButton(
                         onClick = onConfirm
-                    ) { Text("OK") }
+                    ) { Text(stringResource(id = R.string.okText)) }
                 }
             }
         }

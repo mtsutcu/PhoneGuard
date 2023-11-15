@@ -21,19 +21,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mtsapps.phoneguardian.data.entities.CallContact
 import com.mtsapps.phoneguardian.data.entities.Contact
-import com.mtsapps.phoneguardian.domain.models.CallContact
 import com.mtsapps.phoneguardian.domain.utils.nameFromUnknownCaller
 import com.mtsapps.phoneguardian.presentation.components.BlockBottomSheet
 import com.mtsapps.phoneguardian.presentation.components.bottom_navigation.CallLogCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsViewModel: ContactsViewModel) {
+fun MissedScreen(modifier: Modifier,contactsViewModel: ContactsViewModel,) {
     val uiState by contactsViewModel.uiState.collectAsState()
     val phones = uiState.phoneNumbersList
     val categoryList = uiState.categoryList
-    Scaffold { innerPaddig ->
+    val callLogList = uiState.missedCalls
+    Scaffold { _ ->
         val isExpanded = remember{ mutableIntStateOf(-1) }
         val bottomSheetStateState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val openBottomSheetState = rememberSaveable { mutableStateOf(false) }
@@ -49,7 +50,7 @@ fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsVie
                     bottomSheetState = bottomSheetStateState,
                     openBottomSheetState = openBottomSheetState,
                     categoryList = it,
-                    bottomSheetContactState,
+                    bottomSheetCallContactState =bottomSheetContactState,
                     isBlocked = isBlockedState
                 ) { category, callContact ->
                     bottomSheetContactState.value.number?.let {
@@ -74,11 +75,11 @@ fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsVie
         }
         LazyColumn(
             modifier = modifier
-                .padding(innerPaddig).background(color = MaterialTheme.colorScheme.surface)
+                .background(color = MaterialTheme.colorScheme.surface)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {itemsIndexed(items = callLogList){index, item ->
+        ) {itemsIndexed(items = callLogList!!){index, item ->
             val containName = item.number?.let { phones?.contains(it) } == true
             CallLogCard(name = item.name.nameFromUnknownCaller(), number =if(!item.number.isNullOrEmpty()) item.number else "Unknown", photo =item.photoUri ,isExpanded = isExpanded,
                 index = index,
@@ -98,7 +99,7 @@ fun MissedScreen(modifier: Modifier, callLogList : List<CallContact>,contactsVie
                         bottomSheetContactState.value = CallContact(
                             name = item.name.nameFromUnknownCaller(),
                             number = item.number,
-                            item.photoUri
+                            photoUri = item.photoUri
                         )
                         openBottomSheetState.value = true
                     }
